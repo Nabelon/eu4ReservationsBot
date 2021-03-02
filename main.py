@@ -11,7 +11,7 @@ with open ("token.txt", "r") as myfile:
     TOKEN=myfile.readlines()[0]
 helpResponse = ['']
 helpResponse.append("")
-with open ("readme.md", "r") as myfile:
+with open ("README.md", "r") as myfile:
     helpResponseTmp=myfile.readlines()
     indexCurr = 0;
     for i in range(0, len(helpResponseTmp)):
@@ -142,12 +142,15 @@ async def on_message(message):
             await message.channel.send(helpResponse[i])
         return
     gamemode = ""        
-    if message.channel.name == "reservations" or message.channel.name == "reservations_eu4":
-        gamemode = gamemode = "eu4_VassalsInc"
-    elif message.channel.name == "reservations_vic2":
-        gamemode = gamemode = "vic2_normal"
-    elif message.channel.name == "reservations_hoi4":
-        gamemode = gamemode = "hoi4_normal"
+    print(message.channel.name)
+    if message.channel.name.startswith("reservations_eu4"):
+        gamemode = "eu4_VassalsInc"
+    elif message.channel.name.startswith("reservations_vic2"):
+        gamemode = "vic2_normal"
+    elif message.channel.name.startswith("reservations_hoi4"):
+        gamemode = "hoi4_normal"
+    elif message.channel.name.startswith("reservations"):
+        gamemode = "eu4_VassalsInc"
     else:
         return
     if gamemode != "" and message.content == "!deleteReservations" and (message.author.guild_permissions.administrator or message.author.id == 207462846336991232):
