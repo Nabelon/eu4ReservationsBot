@@ -32,6 +32,8 @@ gamemodes = {"!1444":"eu4_normal", "!includeVassals": "eu4_VassalsInc", "!vic2":
 
 with open('data.json') as json_file:
     tagToNations = json.load(json_file)
+with open('countryDataEU4.json') as json_file:
+    nationColorsEU4 = json.load(json_file)
 for tag in tagToNations.keys():
     for nation in tagToNations[tag][0]:
         nationsToTag[nation] = tag
@@ -74,7 +76,12 @@ def getColoredMap(nations, gamemode):
     colors = {(68,107,163):1}                                       #dont overwrite water/borders
     for nation in nations:
         if nations[nation][0][0]==0 and nations[nation][0][1] == 0:
-            print("skipping "+ nation)
+            if tagToNations[nation][0][0] in nationColorsEU4.keys():
+                print("found " + nation + " in countryDataEU4")
+                cArray = nationColorsEU4[tagToNations[nation][0][0]]
+                colors[(cArray[0],cArray[1],cArray[2])] = 1
+            else:
+                print("skipping "+ nation)
             continue
         if(nations[nation][0][0]>5600 or nations[nation][0][1] > 2000): 
             print("error nation: " + str(nation))
@@ -142,7 +149,6 @@ async def on_message(message):
             await message.channel.send(helpResponse[i])
         return
     gamemode = ""        
-    print(message.channel.name)
     if message.channel.name.startswith("reservations_eu4"):
         gamemode = "eu4_VassalsInc"
     elif message.channel.name.startswith("reservations_vic2"):
