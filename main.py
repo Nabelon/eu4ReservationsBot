@@ -28,7 +28,7 @@ tagToPixel = {}
 guildsToTime = {}       #set min waiting time to 0 so it does nothing atm
 activeOnGuild = {}
 
-gamemodes = ["eu4", "eu4_vanilla", "geckov4", "vic2", "hoi4", "hoi4", "100dev", "antebellum"]
+gamemodes = ["eu4", "eu4_vanilla", "geckov4","gecko", "vic2","vic3", "hoi4", "hoi4", "100dev", "antebellum"]
 
 with open('data/data.json') as json_file:
     tagToNations = json.load(json_file)
@@ -48,7 +48,7 @@ async def getReservedNations(channel):
         for line in split:
             if line.startswith("!reserve ") and len(line.split(" ")) > 2 and line.split(" ")[1] in nationsToTag:
                 nations[nationsToTag[line.split(" ")[1]]] = [tagToPixel[nationsToTag[line.split(" ")[1]]], line.split(" ")[2]]
-                break                         
+                continue                         
             if line.startswith("!reserve ") and len(line.split(" ")) == 2 and line.split(" ")[1] in nationsToTag:
                 nation = line.split(" ")[1]
             elif " " not in line:
@@ -69,20 +69,20 @@ def getColoredMap(nations, gamemode):
     im = Image.open("images/"+ gamemode + ".png")
     width, height = im.size
     pixels = im.load()
-    colors = {(68,107,163):1}                                       #dont overwrite water/borders
+    colors = {(68,107,163):"water"}                                       #dont overwrite water/borders
     for nation in nations:
         if nations[nation][0][0]==0 and nations[nation][0][1] == 0:
             if tagToNations[nation][0][0] in nationColorsEU4.keys():
                 print("found " + nation + " in countryDataEU4")
                 cArray = nationColorsEU4[tagToNations[nation][0][0]]
-                colors[(cArray[0],cArray[1],cArray[2])] = 1
+                colors[(cArray[0],cArray[1],cArray[2])] = nation
             else:
                 print("skipping "+ nation)
             continue
         if(nations[nation][0][0]>5600 or nations[nation][0][1] > 2000): 
             print("error nation: " + str(nation))
             continue                                                #i sometimes write wrong coords into data.json :(
-        colors[pixels[nations[nation][0][0],nations[nation][0][1]]] = 1
+        colors[pixels[nations[nation][0][0],nations[nation][0][1]]] = nation
     print(colors)
     
     im = Image.open("images/" + gamemode + "_small.png")
