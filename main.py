@@ -6,9 +6,10 @@ from PIL import Image
 from discord.ext import commands
 import os
 import time
+import sys
 
-with open ("token.txt", "r") as myfile:
-    TOKEN=myfile.readlines()[0]
+
+TOKEN = sys.argv[1]
 helpResponse = ['']
 helpResponse.append("")
 with open ("README.md", "r") as myfile:
