@@ -1,4 +1,3 @@
-# Work with Python 3.6
 # -*- coding: iso-8859-1 -*-
 import discord
 import json
@@ -8,188 +7,185 @@ import os
 import time
 import sys
 
+# Load config
+with open('config.json') as config_file:
+    config = json.load(config_file)
 
-TOKEN = sys.argv[1]
+TOKEN = config['TOKEN']
 helpResponse = ['']
-helpResponse.append("")
-with open ("README.md", "r") as myfile:
-    helpResponseTmp=myfile.readlines()
-    indexCurr = 0;
-    for i in range(0, len(helpResponseTmp)):
-        if(len(helpResponse[indexCurr]) + len(helpResponseTmp[i]) > 1000):
-            helpResponse.append(helpResponseTmp[i])
-            indexCurr +=1
-        else: 
-            helpResponse[indexCurr] += helpResponseTmp[i]
-            
-client =  commands.Bot(command_prefix='!')
-nationsToTag = {}
-tagToNations = {}
-tagToPixel = {}
-guildsToTime = {}       #set min waiting time to 0 so it does nothing atm
-activeOnGuild = {}
+with open(config['help_file'], "r") as myfile:
+    helpResponseTmp = myfile.readlines()
+    indexCurr = 0
+    for line in helpResponseTmp:
+        if len(helpResponse[indexCurr]) + len(line) > 1000:
+            helpResponse.append(line)
+            indexCurr += 1
+        else:
+            helpResponse[indexCurr] += line
 
-gamemodes = ["eu4", "eu4_vanilla", "geckov4","gecko", "vic2","vic3", "hoi4", "hoi4", "100dev", "antebellum"]
+# Define intents
+intents = discord.Intents.all()
 
-with open('data/data.json') as json_file:
+client = commands.Bot(command_prefix='!', intents=intents)
+nationsToTag, tagToNations, tagToPixel = {}, {}, {}
+guildsToTime, activeOnGuild = {}, {}
+gamemodes = config["gamemodes"]
+
+with open(config['data_file']) as json_file:
     tagToNations = json.load(json_file)
-with open('data/countryDataEU4.json') as json_file:
+
+with open(config['country_data_file']) as json_file:
     nationColorsEU4 = json.load(json_file)
-for tag in tagToNations.keys():
-    for nation in tagToNations[tag][0]:
+
+for tag, data in tagToNations.items():
+    for nation in data[0]:
         nationsToTag[nation] = tag
     nationsToTag[tag] = tag
-    
-    tagToPixel[tag] = [tagToNations[tag][1],tagToNations[tag][2]]
-    
+    tagToPixel[tag] = [data[1], data[2]]
+
 async def getReservedNations(channel):
     nations = {}
-    async for message in channel.history(limit=200):
-        split = message.content.lower().split("\n")
-        for line in split:
-            if line.startswith("!reserve ") and len(line.split(" ")) > 2 and line.split(" ")[1] in nationsToTag:
-                nations[nationsToTag[line.split(" ")[1]]] = [tagToPixel[nationsToTag[line.split(" ")[1]]], line.split(" ")[2]]
-                continue                         
-            if line.startswith("!reserve ") and len(line.split(" ")) == 2 and line.split(" ")[1] in nationsToTag:
-                nation = line.split(" ")[1]
-            elif " " not in line:
-                nation = line
-            else:
-                nation = line.split(" ")[0]  #ignore everything after whitespace
-            if "(" in nation:
-                nation = nation.split("(")[0]
+    user_reservations = {}  # Dictionary to store the most recent reservation per user
+
+    # Process the message history in reverse to prioritize the most recent messages
+    async for message in channel.history(limit=200, oldest_first=False):
+        content = message.content.lower()
+        if content.startswith("!reserve ") or content.startswith("!r "):
+            parts = content.split()
+            if len(parts) > 1:
+                nation = parts[1].split("(")[0]  # This assumes the nation is the second word in the message
+                author_id = message.author.id  # Use author ID to track reservations
+                authorMention = message.author.mention
                 
-            authorName = message.author.nick if (hasattr(message.author, 'nick') and message.author.nick != None) else message.author.name
-            if nation in nationsToTag.keys():
-                nations[nationsToTag[nation]] = [tagToPixel[nationsToTag[nation]], authorName]
-        
+                # Only assign the latest reservation by checking if the user has already reserved a nation
+                if author_id not in user_reservations:
+                    if nation in nationsToTag:
+                        user_reservations[author_id] = nationsToTag[nation]
+                        nations[nationsToTag[nation]] = [tagToPixel[nationsToTag[nation]], authorMention]
+                    elif nation in tagToNations:
+                        user_reservations[author_id] = nation
+                        nations[nation] = [tagToPixel[nation], authorMention]
+
     return nations
-        
+
 def getColoredMap(nations, gamemode):
-    
-    im = Image.open("images/"+ gamemode + ".png")
-    width, height = im.size
+    im = Image.open(os.path.join(config['image_dir'], gamemode + ".png"))
     pixels = im.load()
-    colors = {(68,107,163):"water"}                                       #dont overwrite water/borders
-    for nation in nations:
-        if nations[nation][0][0]==0 and nations[nation][0][1] == 0:
-            if tagToNations[nation][0][0] in nationColorsEU4.keys():
-                print("found " + nation + " in countryDataEU4")
-                cArray = nationColorsEU4[tagToNations[nation][0][0]]
-                colors[(cArray[0],cArray[1],cArray[2])] = nation
-            else:
-                print("skipping "+ nation)
-            continue
-        if(nations[nation][0][0]>5600 or nations[nation][0][1] > 2000): 
-            print("error nation: " + str(nation))
-            continue                                                #i sometimes write wrong coords into data.json :(
-        colors[pixels[nations[nation][0][0],nations[nation][0][1]]] = nation
-    print(colors)
-    
-    im = Image.open("images/" + gamemode + "_small.png")
+    colors = {(68, 107, 163): "water"}
+    for nation, data in nations.items():
+        if data[0][0] == 0 and data[0][1] == 0 and tagToNations[nation][0][0] in nationColorsEU4:
+            cArray = nationColorsEU4[tagToNations[nation][0][0]]
+            colors[(cArray[0], cArray[1], cArray[2])] = nation
+        else:
+            colors[pixels[data[0][0], data[0][1]]] = nation
+
+    im = Image.open(os.path.join(config['image_dir'], gamemode + "_small.png"))
     pixels = im.load()
     width, height = im.size
-    for i in range(0, width): 
-        for j in range(0, height): 
+    for i in range(width):
+        for j in range(height):
             color = pixels[i, j]
-            if  ((not (color==(68,107,163))) and ((((i+1) < width) and not (pixels[i+1, j] == color) and (color in colors.keys() or pixels[i+1,j] in colors.keys())) or 
-                    (((j+1) < height) and not (pixels[i, j+1] == color) and (color in colors.keys() or pixels[i,j+1] in colors.keys())))):
-                pixels[i, j] = (0,0,0)
-            elif pixels[i, j] not in colors.keys():
-                pixels[i,j] = (127,127,127)
+            if (color != (68, 107, 163)) and ((i + 1 < width and pixels[i + 1, j] != color) or (j + 1 < height and pixels[i, j + 1] != color)):
+                pixels[i, j] = (0, 0, 0)
+            elif color not in colors:
+                pixels[i, j] = (127, 127, 127)
     return im
-    
+
 def createReservationsString(nations):
-    reservationsStr = "**Total Players: " + str(len(nations)) + "**\n" 
-    nationsArr = [0]*len(nations)
-    i = 0
-    for n in nations.keys():
-        nationsArr[i] = tagToNations[n][0][0] + " : " + str(nations[n][1])
-        i+=1
-    nationsArr.sort()
-    for i in range(0,len(nationsArr)):
-        reservationsStr += "\n" + nationsArr[i]
-    print(reservationsStr.encode('utf-8', 'replace'))
+    reservationsStr = ""
+    nationsArr = [f"{tagToNations[n][0][0].capitalize()} : {nations[n][1]}" for n in nations]
+    reservationsStr += "\n".join(sorted(nationsArr))
     return reservationsStr
-    
-async def updateMap(message, reservationsChannel, reservationMapChannel, gamemode = "eu4_VassalsInc"):
-    print(gamemode)
+
+async def updateMap(message, reservationsChannel, reservationMapChannel, gamemode=config["default_gamemode"]):
     async for m in reservationMapChannel.history(limit=200):
         if m.content.startswith("!gamemode=") and len(m.content) > 11:
-            gamemode = m.content.split("=")[1].lower()
-            if gamemode not in gamemodes:
-                raise ValueError('unkown gamemode: ' + gamemode)
+            gm = m.content.split("=")[1].lower()
+            if gm in gamemodes:
+                gamemode = gm
+            else:
+                raise ValueError('Unknown gamemode: ' + gm)
         elif m.content == "!offline":
             return
     async with reservationMapChannel.typing():
         nations = await getReservedNations(reservationsChannel)
-        print(gamemode)
-        map = getColoredMap(nations, gamemode)
-        map.save("reservations.png")
-    
+        map_img = getColoredMap(nations, gamemode)
+        map_img_path = "reservations.png"
+        map_img.save(map_img_path)
+
+    # Create embed for the reservation message
+    embed = discord.Embed(
+        title=f"Reservations ({len(nations)})",
+        description="Reservations List",
+        color=discord.Color.blue()  # You can choose any color you prefer
+    )
+
+    embed.add_field(name="Reservations", value=createReservationsString(nations), inline=False)
+
+    # Attach the image within the embed
+    file = discord.File(map_img_path, filename="reservations.png")
+    embed.set_image(url=f"attachment://reservations.png")
+
     async for m in reservationMapChannel.history(limit=200):
         if client.user == m.author:
-            await m.delete()    
-    m = await reservationMapChannel.send(content=createReservationsString(nations),file=discord.File("reservations.png"))
-    
+            await m.delete()
+
+    await reservationMapChannel.send(embed=embed, file=file)
+
 @client.event
 async def on_message(message):
-    # we do not want the bot to reply to itself
     if message.author == client.user:
         return
-    if message.guild == None:
-       # if message.content == ('!help'):
-        for i in range(0, len(helpResponse)):
-            await message.channel.send(helpResponse[i])
+
+    # Handle direct messages
+    if message.guild is None:
+        for response in helpResponse:
+            await message.channel.send(response)
         return
-    gamemode = "eu4"
-    if not message.channel.name.startswith("reservations"):
+
+    # Handle only reservation-related channels
+    if not message.channel.name.startswith("reservations") or message.channel.name.endswith("map"):
         return
-    if message.channel.name.endswith("map"):
-        return
-    if message.channel.name.startswith("reservations") and message.content == "!deleteReservations" and (message.author.guild_permissions.administrator or message.author.id == 207462846336991232):
+
+    # Delete reservations if admin command
+    if message.content == "!deleteReservations" and (message.author.guild_permissions.administrator or message.author.id == 207462846336991232):
         async for m in message.channel.history(limit=200):
-            await m.delete()    
+            await m.delete()
         return
-    if message.guild in activeOnGuild.keys():
-        print("Spamm detected!")
+
+    # Prevent spam detection
+    if message.guild in activeOnGuild:
+        print("Spam detected!")
         return
-    else:
-        activeOnGuild[message.guild] = 0
-    
-    #pick channel where reservations are done
+
+    activeOnGuild[message.guild] = 0
+
+    # Find the associated map channel
     channels = message.guild.text_channels
-    reservationsChannel = message.channel
-    reservationMapChannel = None
-    for i in channels:
-        if i.name == message.channel.name + "_map" or i.name == message.channel.name + "map":
-            reservationMapChannel = i
-    if reservationMapChannel == None:
+    reservationsChannel, reservationMapChannel = message.channel, None
+    for ch in channels:
+        if ch.name == message.channel.name + "_map" or ch.name == message.channel.name + "map":
+            reservationMapChannel = ch
+            break
+
+    if not reservationMapChannel:
         activeOnGuild.pop(message.guild, None)
-        await message.author.send("Error: no channel named \"" + message.channel.name + "_map\" found!")
-        return          
-    if message.guild.id not in guildsToTime.keys():
-        guildsToTime[message.guild.id] = 0.0
-    nation = message.content.lower() if " " not in message.content else message.content.split(" ")[0].lower()   #ignore everything after whitespace
-    nation = nation if "(" not in nation else nation.split("(")[0]   
-    if message.content.startswith('!reservations') or nation in nationsToTag or nation in tagToPixel or message.content.startswith('!reserve '):
-        if message.content.startswith('!reservations') or (time.time() - guildsToTime[message.guild.id] > 0):
-            try:
-                await updateMap(message, reservationsChannel, reservationMapChannel, gamemode)
-            except Exception as e:
-                await message.author.send("Error: \n" + str(e))
-            guildsToTime[message.guild.id] = time.time()
-         
-    activeOnGuild.pop(message.guild, None)    
-    
-    
-    
+        await message.author.send(f"Error: no channel named \"{message.channel.name}_map\" found!")
+        return
+
+    # Update map for !reservations or any reservation command
+    if message.content.startswith('!reservations') or message.content.startswith('!reserve ') or message.content.startswith('!r ') or any(nation in message.content.lower() for nation in nationsToTag):
+        try:
+            await updateMap(message, reservationsChannel, reservationMapChannel)
+        except Exception as e:
+            await message.author.send(f"Error: \n{str(e)}")
+        guildsToTime[message.guild.id] = time.time()
+
+    activeOnGuild.pop(message.guild, None)
+
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(f'Logged in as {client.user.name} ({client.user.id})')
     print('------')
-    global oldtime
 
 client.run(TOKEN)
