@@ -1,0 +1,9 @@
+{
+    "TOKEN": "",
+    "help_file": "README.md",
+    "data_file": "data/data.json",
+    "country_data_file": "data/countryDataEU4.json",
+    "image_dir": "images/",
+    "gamemodes": ["eu4", "eu4_vanilla", "geckov4", "gecko", "vic2", "vic3", "hoi4", "hoi4", "100dev", "antebellum"],
+    "default_gamemode": "eu4_VassalsInc"
+}
