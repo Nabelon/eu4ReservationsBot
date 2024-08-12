@@ -1,25 +1,44 @@
-# eu4reservations
-A discord bot for EU4 multiplayer games
+# EU4Reservations Bot
 
-Join https://discord.gg/Gd6TJXzYMg if you need help
-Add this bot to your server: https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot
+A Discord bot for managing EU4 multiplayer game reservations.
 
-How to use:
-Create two channels on your server, one named "reservations" and one named "reservationsmap"
-Make sure the bot has read rights in the reservations channel and read+write rights in the reservationsmap channel
-If you want to use !deleteReservations it also needs edit rights in the reservations channel
+### Quick Links:
+- **[Join the Support Server](https://discord.gg/zcu5aFwKGf)**
+- **[Add the Bot to Your Server](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot)**
 
-The bot waits for a message in #reservations, if its a nation it posts an updated map in #reservationsmap, !reservations can be used to force the bot to update if you don't want to reserve anything but still update the map (e.g. after someone deleted/edited a message).
-The bot ONLY updates the map when a new message is send in #reservations. If you change/delete past messages, the map will not update until a new reservation or !reservations in the #reservations channel
+### Setup:
+1. **Create Channels:**
+   - `#reservations`: The channel where players will reserve their nations.
+   - `#reservationsmap`: The channel where the bot will post the updated map.
 
-#Nations with spaces in their name DO NOT WORK by default, either use their tag or "_" instead of space
+2. **Bot Permissions:**
+   - `#reservations`: Ensure the bot has read permissions.
+   - `#reservationsmap`: Ensure the bot has read and write permissions.
+   - If you want to use `!deleteReservations`, the bot needs edit permissions in the `#reservations` channel.
 
-Write \"!1444\" in #reservationsmap if you don't want vassals to be merged with their overlord (makes france and muscovy look ugly)
-Write \"!reserve fra Max\" in #reservation to reserve France for the player called Max
-Write !offline  in #reservationsmap if you want the bot to not do anything right now.
-Write !geckoV4  in #reservationsmap if you are playing with the geckoV4 mod
-Write !AnteBellum  in #reservationsmap if you are playing with the AnteBellum mod
+### How to Use:
+- The bot listens for messages in the `#reservations` channel. If a valid nation is reserved, it updates the map in the `#reservationsmap` channel.
+- To force an update without reserving a nation (e.g., after deleting/editing a message), use the `!reservations` command in `#reservations`.
+- **Important:** The bot updates the map only when a new message is sent in `#reservations`. If you change or delete past messages, the map won't update until a new reservation is made or `!reservations` is used.
 
-Bot is hosted for free atm and the host only allows for 450 hours hosting time per month, if bot if offline at end of month said limit has been reached :(
+### Nation Name Format:
+- **Nations with spaces** in their names do not work by default. Use their tag or replace spaces with underscores (`_`).
 
-For HOI4 and VIC2, create a reservations_hoi4/reservations_vic2 channel for reservations and a reservations_hoi4_map/reservations_vic2_map channel for the map"
+### Commands:
+- `!1444` in `#reservationsmap`: Prevents vassals from being merged with their overlord (e.g., France and Muscovy).
+- `!reserve fra Max` in `#reservations`: Reserves France for the player named Max.
+- `!offline` in `#reservationsmap`: Temporarily disables the bot.
+- `!geckoV4` in `#reservationsmap`: Use if playing with the geckoV4 mod.
+- `!AnteBellum` in `#reservationsmap`: Use if playing with the AnteBellum mod.
+
+### Additional Information:
+- For HOI4 and VIC2, create `#reservations_hoi4 / #reservations_vic2` channels for reservations and `#reservations_hoi4_map / #reservations_vic2_map` channels for the map.
+
+---
+
+### Project Updates:
+This bot is an upgraded version of the original project by Ben. Improvements include:
+- **One country per person** restriction.
+- **Enhanced reservation message design**.
+- **Code improvements**.
+- **Compatibility with the latest version of discord.py**.
