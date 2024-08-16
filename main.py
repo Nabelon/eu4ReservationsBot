@@ -115,16 +115,10 @@ async def sendHelpMessage(channel):
 
 @client.event
 async def on_message(message):
-    if message.author != client.user and message.guild:
-        print(f"Received message: {message.content}")
-
         c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
         log = c.fetchone()
-        
-        # Only process commands if !start has been used in this channel
         if not log:
             if message.content.startswith("!start"):
-                print("Detected !start command")
                 parts = message.content.split()
                 gamemode = parts[1].lower() if len(parts) > 1 else config["default_gamemode"]
 
@@ -154,13 +148,9 @@ async def on_message(message):
                 await message.channel.send("Please use the !start command to initiate reservations before reserving a nation.")
                 await message.delete()
             return
-
-        # If !start has been used, process other commands
         if log:
             gamemode = log[1]
-
             if message.content.startswith("!reserve") or message.content.startswith("!r "):
-                print("Detected !reserve command")
                 try:
                     parts = message.content.split()
                     if len(parts) < 2:
@@ -192,7 +182,6 @@ async def on_message(message):
                 await message.delete()
             return
         if message.content.startswith("!unreserve"):
-            print("Detected !unreserve command")
             try:
                 user_id = message.author.id
                 if len(message.mentions) > 0:
@@ -216,7 +205,6 @@ async def on_message(message):
             return
 
         if message.content.startswith("!delete"):
-            print("Detected !delete command")
             if message.author.guild_permissions.administrator:
                 try:
                     c.execute('DELETE FROM reservations WHERE channel_id = ?', (message.channel.id,))
