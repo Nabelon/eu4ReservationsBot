@@ -115,6 +115,7 @@ async def sendHelpMessage(channel):
 
 @client.event
 async def on_message(message):
+    if message.author != client.user and message.guild:
         c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
         log = c.fetchone()
         if not log:
@@ -170,17 +171,16 @@ async def on_message(message):
                         c.execute('INSERT INTO reservations (server_id, channel_id, user_id, nation, date) VALUES (?, ?, ?, ?, ?)',
                                   (message.guild.id, message.channel.id, user_id, nation, time.strftime('%Y-%m-%d %H:%M:%S')))
                         conn.commit()
-                        async for m in message.channel.history(limit=200, oldest_first=False):
-                            if m.author != client.user and not m.embeds:
-                                await m.delete()
+
+                        await message.delete()
+
                         await updateMap(message, message.channel, message.channel, gamemode=gamemode)
                     else:
                         await message.channel.send(f"Nation '{nation}' not recognized.")
                 except Exception as e:
                     await message.channel.send(f"Error: \n{str(e)}")
-            else:
-                await message.delete()
             return
+
         if message.content.startswith("!unreserve"):
             try:
                 user_id = message.author.id
