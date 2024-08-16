@@ -1,44 +1,108 @@
-# EU4Reservations Bot
+# Discord Reservation Bot
 
-A Discord bot for managing EU4 multiplayer game reservations.
+This Discord bot is designed to manage nation reservations in a multiplayer gaming environment. It supports multiple servers and channels, allowing players to reserve nations, view current reservations, and manage the reservation process. The bot uses SQLite for data storage and can generate a map image highlighting the reserved nations.
 
-### Quick Links:
-- **[Join the Support Server](https://discord.gg/zcu5aFwKGf)**
-- **[Add the Bot to Your Server](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot)**
+---
 
-### Setup:
-1. **Create Channels:**
-   - `#reservations`: The channel where players will reserve their nations.
-   - `#reservationsmap`: The channel where the bot will post the updated map.
+## Features
 
-2. **Bot Permissions:**
-   - `#reservations`: Ensure the bot has read permissions.
-   - `#reservationsmap`: Ensure the bot has read and write permissions.
-   - If you want to use `!deleteReservations`, the bot needs edit permissions in the `#reservations` channel.
+- **Multi-Server and Multi-Channel Support**: The bot can operate in multiple servers and channels, maintaining separate reservation lists for each channel.
+- **Nation Reservation**: Users can reserve a nation for themselves, and server managers can reserve nations for others.
+- **Reservation Logging**: The bot logs all reservations and allows for the deletion and resetting of reservations.
+- **Map Generation**: The bot generates an image highlighting the reserved nations, which is then posted in the channel.
+- **Automated Cleanup**: Old reservations are automatically cleaned up every 12 hours.
 
-### How to Use:
-- The bot listens for messages in the `#reservations` channel. If a valid nation is reserved, it updates the map in the `#reservationsmap` channel.
-- To force an update without reserving a nation (e.g., after deleting/editing a message), use the `!reservations` command in `#reservations`.
-- **Important:** The bot updates the map only when a new message is sent in `#reservations`. If you change or delete past messages, the map won't update until a new reservation is made or `!reservations` is used.
+---
 
-### Nation Name Format:
-- **Nations with spaces** in their names do not work by default. Use their tag or replace spaces with underscores (`_`).
+## Commands
 
-### Commands:
-- `!1444` in `#reservationsmap`: Prevents vassals from being merged with their overlord (e.g., France and Muscovy).
-- `!reserve fra Max` in `#reservations`: Reserves France for the player named Max.
-- `!offline` in `#reservationsmap`: Temporarily disables the bot.
-- `!geckoV4` in `#reservationsmap`: Use if playing with the geckoV4 mod.
-- `!AnteBellum` in `#reservationsmap`: Use if playing with the AnteBellum mod.
+- **`!start [gamemode]`**: 
+  - Initializes the reservation process for a specific game mode.
+  - Example: `!start eu4`
+  - **Note**: This command must be used before any reservations can be made.
 
-### Additional Information:
-- For HOI4 and VIC2, create `#reservations_hoi4 / #reservations_vic2` channels for reservations and `#reservations_hoi4_map / #reservations_vic2_map` channels for the map.
+- **`!reserve [nation]`**: 
+  - Reserves a nation for yourself.
+  - Example: `!reserve france`
+  - **Note**: Ensure the reservation process has been started with `!start` before using this command.
+
+- **`!reserve [nation] [user]`**: 
+  - Allows game managers (those with mute permissions) to reserve a nation for another user.
+  - Example: `!reserve france @username`
+
+- **`!unreserve`**: 
+  - Removes your current reservation.
+  - Example: `!unreserve`
+  - Game managers can also unreserve a nation for another user by mentioning them.
+  - Example: `!unreserve @username`
+
+- **`!delete`**: 
+  - Deletes all reservations and the logged game mode for the current channel.
+  - Example: `!delete`
+  - **Note**: Only administrators can use this command.
+
+- **`!help`**: 
+  - Displays a list of available commands.
+  - Example: `!help`
+
+---
+
+## How It Works
+
+1. **Initialization**:
+   - The bot is initialized with the configuration and data files (`config.json`, `data_file`, `country_data_file`) which contain necessary game and nation information.
+   - The SQLite database is set up with tables for reservations and reservation logs.
+
+2. **Starting a Reservation Session**:
+   - A reservation session is started using the `!start [gamemode]` command.
+   - The bot logs the game mode and channel ID in the database, ensuring that all subsequent reservations are associated with the correct game mode and channel.
+
+3. **Reserving Nations**:
+   - Users reserve nations by issuing the `!reserve [nation]` command.
+   - The bot checks if the nation is valid and then logs the reservation in the database.
+   - If the user already has a reservation, the bot will automatically switch the user's reservation to the new nation.
+   
+4. **Updating the Map**:
+   - After each reservation, the bot generates an updated map image highlighting the reserved nations.
+   - The image is posted in the channel along with a list of current reservations.
+
+5. **Unreserving**:
+   - Users can remove their reservations using the `!unreserve` command.
+   - Game managers can remove reservations for other users by mentioning them.
+
+6. **Deleting Reservations**:
+   - Administrators can reset the reservation process in a channel using the `!delete` command.
+   - This command deletes all reservations and logs for the channel, effectively starting fresh.
+
+7. **Automated Cleanup**:
+   - The bot periodically cleans up old reservations and logs that are older than 30 days.
 
 ---
 
 ### Project Updates:
 This bot is an upgraded version of the original project by Ben. Improvements include:
-- **One country per person** restriction.
-- **Enhanced reservation message design**.
-- **Code improvements**.
-- **Compatibility with the latest version of discord.py**.
+- **Start command adds simplicity to the bot**.
+- **Each person can only reserve one nation**.
+- **Complete code overhaul, only similar thing is map generation**.
+- **Compatability with latest version of discord.py**.
+- **Added database for speed and ease of use**.
+
+---
+
+## Example Usage
+
+1. **Start a Reservation Session**:
+
+!start eu4
+
+2. **Reserve a Nation**:
+
+!reserve france
+
+3. **Unreserve a Nation**:
+
+!unreserve
+
+4. **Delete All Reservations**:
+
+!delete
