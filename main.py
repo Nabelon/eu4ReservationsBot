@@ -118,94 +118,49 @@ async def on_message(message):
     if message.author != client.user and message.guild:
         print(f"Received message: {message.content}")
 
-        if message.content.startswith("!start"):
-            print("Detected !start command")
-            parts = message.content.split()
-            gamemode = parts[1].lower() if len(parts) > 1 else config["default_gamemode"]
-
-            if gamemode not in valid_gamemodes:
-                await message.channel.send(f"Error: Gamemode '{gamemode}' is not recognized. Please choose from the following: {', '.join(valid_gamemodes)}.")
-                await message.delete()
-                return
-
-            c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
-            log = c.fetchone()
-            if log:
-                await message.delete()
-                return
-
-            try:
-                print(f"Starting reservations in channel {message.channel.name} for gamemode: {gamemode}")
-
-                c.execute('INSERT INTO reservation_logs (channel_id, gamemode, creation_date) VALUES (?, ?, ?)',
-                          (message.channel.id, gamemode, time.strftime('%Y-%m-%d %H:%M:%S')))
-                conn.commit()
-
-                await message.delete()
-
-                await updateMap(message, message.channel, message.channel, gamemode=gamemode)
-
-                return
-            except Exception as e:
-                print(f"Error in !start command: {e}")
-                await message.author.send("An error occurred while starting the reservation. Please try again.")
-            return
-        if message.content.startswith("!unreserve"):
-            print("Detected !unreserve command")
-            try:
-                user_id = message.author.id
-                if len(message.mentions) > 0:
-                    if message.author.guild_permissions.mute_members:
-                        user_id = message.mentions[0].id
-                    else:
-                        await message.channel.send("You don't have permission to unreserve for others.")
-                        return
-                
-                c.execute('DELETE FROM reservations WHERE channel_id = ? AND user_id = ?', (message.channel.id, user_id))
-                conn.commit()
-
-                await message.delete()
-
-                c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
-                log = c.fetchone()
-                if log:
-                    gamemode = log[1]
-                    await updateMap(message, message.channel, message.channel, gamemode=gamemode)
-
-            except Exception as e:
-                await message.channel.send(f"Error: \n{str(e)}")
-            return
-        if message.content.startswith("!delete"):
-            print("Detected !delete command")
-            if message.author.guild_permissions.administrator:
-                try:
-                    c.execute('DELETE FROM reservations WHERE channel_id = ?', (message.channel.id,))
-                    c.execute('DELETE FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
-                    conn.commit()
-
-                    confirmation_message = await message.channel.send("All reservations and logs have been deleted for this channel.")
-
-                    await message.delete()
-                    await confirmation_message.delete()
-
-                except Exception as e:
-                    await message.channel.send(f"Error: \n{str(e)}")
-            else:
-                await message.channel.send("You do not have permission to use this command.")
-            return
         c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
         log = c.fetchone()
         
+        # Only process commands if !start has been used in this channel
         if not log:
+            if message.content.startswith("!start"):
+                print("Detected !start command")
+                parts = message.content.split()
+                gamemode = parts[1].lower() if len(parts) > 1 else config["default_gamemode"]
+
+                if gamemode not in valid_gamemodes:
+                    await message.channel.send(f"Error: Gamemode '{gamemode}' is not recognized. Please choose from the following: {', '.join(valid_gamemodes)}.")
+                    await message.delete()
+                    return
+
+                try:
+                    print(f"Starting reservations in channel {message.channel.name} for gamemode: {gamemode}")
+
+                    c.execute('INSERT INTO reservation_logs (channel_id, gamemode, creation_date) VALUES (?, ?, ?)',
+                              (message.channel.id, gamemode, time.strftime('%Y-%m-%d %H:%M:%S')))
+                    conn.commit()
+
+                    await message.delete()
+
+                    await updateMap(message, message.channel, message.channel, gamemode=gamemode)
+
+                    return
+                except Exception as e:
+                    print(f"Error in !start command: {e}")
+                    await message.author.send("An error occurred while starting the reservation. Please try again.")
+                return
+
             if message.content.startswith("!reserve") or message.content.startswith("!r "):
                 await message.channel.send("Please use the !start command to initiate reservations before reserving a nation.")
                 await message.delete()
-            else:
-                await message.delete()
             return
+
+        # If !start has been used, process other commands
         if log:
             gamemode = log[1]
+
             if message.content.startswith("!reserve") or message.content.startswith("!r "):
+                print("Detected !reserve command")
                 try:
                     parts = message.content.split()
                     if len(parts) < 2:
@@ -235,6 +190,48 @@ async def on_message(message):
                     await message.channel.send(f"Error: \n{str(e)}")
             else:
                 await message.delete()
+            return
+        if message.content.startswith("!unreserve"):
+            print("Detected !unreserve command")
+            try:
+                user_id = message.author.id
+                if len(message.mentions) > 0:
+                    if message.author.guild_permissions.mute_members:
+                        user_id = message.mentions[0].id
+                    else:
+                        await message.channel.send("You don't have permission to unreserve for others.")
+                        return
+                
+                c.execute('DELETE FROM reservations WHERE channel_id = ? AND user_id = ?', (message.channel.id, user_id))
+                conn.commit()
+
+                await message.delete()
+
+                if log:
+                    gamemode = log[1]
+                    await updateMap(message, message.channel, message.channel, gamemode=gamemode)
+
+            except Exception as e:
+                await message.channel.send(f"Error: \n{str(e)}")
+            return
+
+        if message.content.startswith("!delete"):
+            print("Detected !delete command")
+            if message.author.guild_permissions.administrator:
+                try:
+                    c.execute('DELETE FROM reservations WHERE channel_id = ?', (message.channel.id,))
+                    c.execute('DELETE FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
+                    conn.commit()
+
+                    confirmation_message = await message.channel.send("All reservations and logs have been deleted for this channel.")
+
+                    await message.delete()
+                    await confirmation_message.delete()
+
+                except Exception as e:
+                    await message.channel.send(f"Error: \n{str(e)}")
+            else:
+                await message.channel.send("You do not have permission to use this command.")
             return
 
 async def delete_messages_after_start(channel):
