@@ -121,11 +121,8 @@ async def delete_after_delay(message, delay=5):
 async def on_message(message):
     if message.author != client.user and message.guild:
         try:
-            # Connect to the database
             conn = sqlite3.connect('reservations.db')
             c = conn.cursor()
-
-            # Fetch the reservation log for the channel
             c.execute('SELECT * FROM reservation_logs WHERE channel_id = ?', (message.channel.id,))
             log = c.fetchone()
 
@@ -250,7 +247,6 @@ async def on_message(message):
                         await delete_after_delay(message)
                     return
 
-            # Ensure all other messages (commands) are deleted after processing
             await client.process_commands(message)
             await delete_after_delay(message)
 
@@ -261,7 +257,6 @@ async def on_message(message):
             print(f"Unexpected error: {e}")
             await message.author.send("An unexpected error occurred. Please try again.")
         finally:
-            # Ensure the database connection is closed after processing
             conn.close()
 
 async def delete_messages_after_start(channel):
@@ -288,6 +283,20 @@ async def cleanup_old_reservations():
 @client.event
 async def on_ready():
     cleanup_old_reservations.start()
+    
+    c.execute('SELECT * FROM reservation_logs')
+    active_logs = c.fetchall()
+
+    for log in active_logs:
+        channel_id = log[0]
+        gamemode = log[1]
+        try:
+            channel = client.get_channel(channel_id)
+            if channel:
+               await getReservedNations(channel.id)
+        except Exception as e:
+            print(f"Error loading active reservation for channel {channel_id}: {e}")
+
     print(f'Logged in as {client.user.name} ({client.user.id})\n------')
 
 client.run(TOKEN)
