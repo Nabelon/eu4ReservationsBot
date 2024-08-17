@@ -1,108 +1,142 @@
-# Discord Reservation Bot
+<div align="center">
+    <img src="https://i.imgur.com/F60J2JS.png" alt="Discord Relay Bot" width="100" />
+    <h1>UpgradedReservations</h1>
+</div>
 
-This Discord bot is designed to manage nation reservations in a multiplayer gaming environment. It supports multiple servers and channels, allowing players to reserve nations, view current reservations, and manage the reservation process. The bot uses SQLite for data storage and can generate a map image highlighting the reserved nations.
+<div align="center">
 
----
+[![Follow @saple1337](https://img.shields.io/badge/Follow-@saple1337-181717?style=for-the-badge&logo=github)](https://github.com/saple1337)
+[![Star](https://img.shields.io/badge/Star-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations)
+[![Fork](https://img.shields.io/badge/Fork-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations/fork)
+[![Watch](https://img.shields.io/badge/Watch-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations/subscription)
+[![Buy Me a Coffee](https://i.imgur.com/mYcE2J8.png)](https://www.buymeacoffee.com/saple1337)
 
-## Features
+</div>
 
-- **Multi-Server and Multi-Channel Support**: The bot can operate in multiple servers and channels, maintaining separate reservation lists for each channel.
-- **Nation Reservation**: Users can reserve a nation for themselves, and server managers can reserve nations for others.
-- **Reservation Logging**: The bot logs all reservations and allows for the deletion and resetting of reservations.
-- **Map Generation**: The bot generates an image highlighting the reserved nations, which is then posted in the channel.
-- **Automated Cleanup**: Old reservations are automatically cleaned up every 12 hours.
-
----
-
-## Commands
-
-- **`!start [gamemode]`**: 
-  - Initializes the reservation process for a specific game mode.
-  - Example: `!start eu4`
-  - **Note**: This command must be used before any reservations can be made.
-
-- **`!reserve [nation]`**: 
-  - Reserves a nation for yourself.
-  - Example: `!reserve france`
-  - **Note**: Ensure the reservation process has been started with `!start` before using this command.
-
-- **`!reserve [nation] [user]`**: 
-  - Allows game managers (those with mute permissions) to reserve a nation for another user.
-  - Example: `!reserve france @username`
-
-- **`!unreserve`**: 
-  - Removes your current reservation.
-  - Example: `!unreserve`
-  - Game managers can also unreserve a nation for another user by mentioning them.
-  - Example: `!unreserve @username`
-
-- **`!delete`**: 
-  - Deletes all reservations and the logged game mode for the current channel.
-  - Example: `!delete`
-  - **Note**: Only administrators can use this command.
-
-- **`!help`**: 
-  - Displays a list of available commands.
-  - Example: `!help`
+## **Table of Contents**
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Bot](#running-the-bot)
+- [Commands](#commands)
+- [Contributing](#contributing)
+- [Support](#support)
+- [License](#license)
 
 ---
 
-## How It Works
+## **Introduction**
 
-1. **Initialization**:
-   - The bot is initialized with the configuration and data files (`config.json`, `data_file`, `country_data_file`) which contain necessary game and nation information.
-   - The SQLite database is set up with tables for reservations and reservation logs.
+Welcome to **UpgradedReservations**—your go-to solution for efficiently managing nation reservations within Discord servers. Whether you're hosting an EU4 multiplayer session or a Hearts of Iron 4 campaign, this bot is designed to simplify the reservation process and enhance the overall experience for your community.
 
-2. **Starting a Reservation Session**:
-   - A reservation session is started using the `!start [gamemode]` command.
-   - The bot logs the game mode and channel ID in the database, ensuring that all subsequent reservations are associated with the correct game mode and channel.
-
-3. **Reserving Nations**:
-   - Users reserve nations by issuing the `!reserve [nation]` command.
-   - The bot checks if the nation is valid and then logs the reservation in the database.
-   - If the user already has a reservation, the bot will automatically switch the user's reservation to the new nation.
-   
-4. **Updating the Map**:
-   - After each reservation, the bot generates an updated map image highlighting the reserved nations.
-   - The image is posted in the channel along with a list of current reservations.
-
-5. **Unreserving**:
-   - Users can remove their reservations using the `!unreserve` command.
-   - Game managers can remove reservations for other users by mentioning them.
-
-6. **Deleting Reservations**:
-   - Administrators can reset the reservation process in a channel using the `!delete` command.
-   - This command deletes all reservations and logs for the channel, effectively starting fresh.
-
-7. **Automated Cleanup**:
-   - The bot periodically cleans up old reservations and logs that are older than 30 days.
+[**Invite the Bot to Your Server**](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot)  
+*Click the link above to add the bot to your Discord server!*
 
 ---
 
-### Project Updates:
-This bot is an upgraded version of the original project by Ben. Improvements include:
-- **Start command adds simplicity to the bot**.
-- **Each person can only reserve one nation**.
-- **Complete code overhaul, only similar thing is map generation**.
-- **Compatability with latest version of discord.py**.
-- **Added database for speed and ease of use**.
+## **Features**
+
+- **Nation Reservations:** Effortlessly reserve nations across multiple supported game modes, ensuring a fair and organized process where no two users can reserve the same nation.
+- **Dynamic Map Generation:** The bot automatically generates a visual map reflecting the current reservations, providing a clear and engaging way to view reservations.
+- **Automated Cleanup:** To maintain an orderly server, the bot automatically removes expired reservations after 30 days, ensuring your channel remains clutter-free.
+- **DM Notifications:** Enjoy personalized notifications delivered directly to your DMs, including error messages, reservation confirmations, and more.
+- **Admin Privileges:** A comprehensive suite of admin commands allows you to manage reservations, view logs, and maintain the database with ease.
 
 ---
 
-## Example Usage
+## **Installation**
 
-1. **Start a Reservation Session**:
+Follow these simple steps to install and configure the UpgradedReservations on your local machine.
 
-!start eu4
+1. **Clone the Repository**
 
-2. **Reserve a Nation**:
+   Begin by cloning the repository to your local environment:
 
-!reserve france
+   ```git clone https://github.com/your-username/discord-reservation-bot.git```
 
-3. **Unreserve a Nation**:
+2. **Install Dependencies**
 
-!unreserve
+   Ensure Python 3.7+ is installed, then proceed to install the required Python libraries:
 
-4. **Delete All Reservations**:
+   ```pip install -r requirements.txt```
 
-!delete
+3. **Create and Configure `config.json`**
+
+   Next, create a `config.json` file in the root directory with the following structure:
+
+   ```blank```
+
+   Replace `YOUR_DISCORD_BOT_TOKEN` with your actual Discord bot token.
+
+4. **Set Up the Database**
+
+   The bot utilizes SQLite for managing reservations. The required tables will be automatically created when the bot is first run.
+
+---
+
+## **Configuration**
+
+### **Data Files**
+
+- `data/tags.json`: Maps country tags to nation names and pixel locations on the map for accurate visual representation.
+- `data/country_colors.json`: Specifies nation colors for the `eu4` game mode, ensuring accurate map visuals.
+- **Images:** Store your game mode-specific map images in the `images/` directory. The bot loads these images to generate the reservation map.
+
+### **Environment Variables**
+
+To ensure the bot operates smoothly, set the following environment variables:
+
+- **TOKEN:** The bot token from your Discord Developer Portal.
+- **DATABASE_URL:** The URL path to the SQLite database.
+
+---
+
+## **Running the Bot**
+
+After setup, you can launch the bot using the following command:
+
+```python main.py```
+
+Once launched, the bot will connect to your Discord server and start listening for commands, ready to manage reservations.
+
+---
+
+## **Commands**
+
+Below is a list of commands available in the UpgradedReservations:
+
+- `!start [gamemode]`: Initiates the reservation process for the specified game mode. Must be executed before any reservations can be made.
+- `!reserve [nation]`: Reserves a nation for yourself. This command can be used after the reservation process is initiated.
+- `!reserve [nation] [user]`: Allows game managers to reserve a nation on behalf of another user.
+- `!unreserve`: Cancels your current reservation. Game managers can also unreserve a nation for another user by mentioning them.
+- `!delete`: Deletes all reservations and the logged game mode for the current channel. Only administrators are permitted to use this command.
+- `!help`: Displays a comprehensive list of available commands and their descriptions.
+
+---
+
+## **Contributing**
+
+We welcome and appreciate contributions to enhance UpgradedReservations. Here’s how you can contribute:
+
+1. **Fork the Repository:** Use the "Fork" button at the top-right of the repository page.
+2. **Clone Your Fork:** Clone the forked repository to your local machine.
+3. **Create a New Branch:** Start a new branch for your specific feature or bugfix.
+4. **Make Your Changes:** Implement your changes or bug fixes.
+5. **Commit Your Changes:** Write a clear, descriptive commit message summarizing your changes.
+6. **Push to Your Branch:** Push your changes to your forked repository.
+7. **Submit a Pull Request:** Open a pull request on the original repository for review.
+
+---
+
+## **Support**
+
+For assistance, feel free to join our [Discord server](https://discord.gg/zcu5aFwKGf) or open an issue on GitHub. We encourage contributions, feedback, and suggestions to continuously improve the bot.
+
+---
+
+## **License**
+
+This project is licensed under the MIT License. Please refer to the LICENSE file for more details.
+
+---
