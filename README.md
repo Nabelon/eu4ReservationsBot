@@ -1,16 +1,17 @@
 <div align="center">
     <img src="https://i.imgur.com/F60J2JS.png" alt="Discord Relay Bot" width="100" />
-    <h1>UpgradedReservations</h1>
+    <h1>EU4ReservationsBot</h1>
 </div>
 
 ## **Table of Contents**
 - [Introduction](#introduction)
 - [Features](#features)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Running the Bot](#running-the-bot)
+- [How to Use](#how-to-use)
 - [Commands](#commands)
-- [Contributing](#contributing)
+- [Installation](#installation)
+-- [Configuration](##configuration)
+-- [Running the Bot](##running-the-bot)
+-- [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
 
@@ -18,7 +19,7 @@
 
 ## **Introduction**
 
-Welcome to **UpgradedReservations**—your go-to solution for efficiently managing nation reservations within Discord servers. Whether you're hosting an EU4 multiplayer session or a Hearts of Iron 4 campaign, this bot is designed to simplify the reservation process and enhance the overall experience for your community.
+Welcome to **EU4ReservationsBot**—your go-to solution for efficiently managing nation reservations within Discord servers. Whether you're hosting an EU4 multiplayer session or a Hearts of Iron 4 campaign, this bot is designed to simplify the reservation process and enhance the overall experience for your community.
 
 [**Invite the Bot to Your Server**](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot)  
 *Click the link above to add the bot to your Discord server!*
@@ -35,9 +36,30 @@ Welcome to **UpgradedReservations**—your go-to solution for efficiently managi
 
 ---
 
+## **how-to-use**
+
+Step 1) [**Invite the Bot to Your Server**](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot) 
+Step 2)	Write "!start" in the channel you want use for the resevations
+Step 3) You are done, reserve nations by writing "!reserve [Nation]"
+
+---
+
+## **Commands**
+
+Below is a list of commands available in the EU4ReservationsBot:
+
+- `!start [gamemode]`: Initiates the reservation process for the specified game mode. Must be executed before any reservations can be made.
+- `!reserve [nation]`: Reserves a nation for yourself. This command can be used after the reservation process is initiated.
+- `!reserve [nation] [user]`: Allows game managers to reserve a nation on behalf of another user.
+- `!unreserve`: Cancels your current reservation. Game managers can also unreserve a nation for another user by mentioning them.
+- `!delete`: Deletes all reservations and the logged game mode for the current channel. Only administrators are permitted to use this command.
+- `!help`: Displays a comprehensive list of available commands and their descriptions.
+
+---
+
 ## **Installation**
 
-Follow these simple steps to install and configure the UpgradedReservations on your local machine.
+If you want to host EU4ReservationsBot on your local machine or modify it, follow these steps.
 
 1. **Clone the Repository**
 
@@ -81,22 +103,9 @@ Once launched, the bot will connect to your Discord server and start listening f
 
 ---
 
-## **Commands**
-
-Below is a list of commands available in the UpgradedReservations:
-
-- `!start [gamemode]`: Initiates the reservation process for the specified game mode. Must be executed before any reservations can be made.
-- `!reserve [nation]`: Reserves a nation for yourself. This command can be used after the reservation process is initiated.
-- `!reserve [nation] [user]`: Allows game managers to reserve a nation on behalf of another user.
-- `!unreserve`: Cancels your current reservation. Game managers can also unreserve a nation for another user by mentioning them.
-- `!delete`: Deletes all reservations and the logged game mode for the current channel. Only administrators are permitted to use this command.
-- `!help`: Displays a comprehensive list of available commands and their descriptions.
-
----
-
 ## **Contributing**
 
-We welcome and appreciate contributions to enhance UpgradedReservations. Here’s how you can contribute:
+We welcome and appreciate contributions to enhance EU4ReservationsBot. Here’s how you can contribute:
 
 1. **Fork the Repository:** Use the "Fork" button at the top-right of the repository page.
 2. **Clone Your Fork:** Clone the forked repository to your local machine.

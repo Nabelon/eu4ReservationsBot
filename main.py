@@ -263,6 +263,8 @@ async def on_message(message):
             await message.author.send("An unexpected error occurred. Please try again.")
         finally:
             conn.close()
+    elif message.author != client.user and message.guild == None:
+        await message.channel.send("Please visit https://github.com/Nabelon/eu4ReservationsBot for Instructions on how to use this bot" )
 
 async def delete_messages_after_start(channel):
     async for message in channel.history(limit=200):
