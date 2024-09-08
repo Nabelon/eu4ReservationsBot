@@ -252,6 +252,9 @@ async def on_message(message):
                         await delete_after_delay(message)
                     return
 
+                if message.content.startswith("!start"):
+                    await message.author.send("Reservations are already running, use !delete first.")
+                    
             await client.process_commands(message)
             await delete_after_delay(message)
 
@@ -273,7 +276,7 @@ async def delete_messages_after_start(channel):
 
 async def delete_after_delay(message, delay=5):
     await asyncio.sleep(delay)
-    await message.delete()
+    #await message.delete()
 
 
 @client.command()
