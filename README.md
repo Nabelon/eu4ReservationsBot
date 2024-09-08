@@ -3,16 +3,6 @@
     <h1>UpgradedReservations</h1>
 </div>
 
-<div align="center">
-
-[![Follow @saple1337](https://img.shields.io/badge/Follow-@saple1337-181717?style=for-the-badge&logo=github)](https://github.com/saple1337)
-[![Star](https://img.shields.io/badge/Star-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations)
-[![Fork](https://img.shields.io/badge/Fork-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations/fork)
-[![Watch](https://img.shields.io/badge/Watch-Repo-181717?style=for-the-badge&logo=github)](https://github.com/saple1337/UpgradedReservations/subscription)
-[![Buy Me a Coffee](https://i.imgur.com/mYcE2J8.png)](https://www.buymeacoffee.com/saple1337)
-
-</div>
-
 ## **Table of Contents**
 - [Introduction](#introduction)
 - [Features](#features)
@@ -63,10 +53,8 @@ Follow these simple steps to install and configure the UpgradedReservations on y
 
 3. **Create and Configure `config.json`**
 
-   Next, create a `config.json` file in the root directory with the following structure:
-
-   ```blank```
-
+   Next, modify the `config.json` file in the root directory with the following structure:
+   
    Replace `YOUR_DISCORD_BOT_TOKEN` with your actual Discord bot token.
 
 4. **Set Up the Database**
