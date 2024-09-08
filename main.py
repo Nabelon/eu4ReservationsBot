@@ -21,7 +21,10 @@ for tag, data in tagToNations.items():
     nationsToTag[tag.lower()] = tag
     tagToPixel[tag] = [data[1], data[2]]
 
-intents = discord.Intents.all()
+intents = discord.Intents.default()
+intents.messages = True
+intents.message_content = True
+
 client = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
 conn = sqlite3.connect('reservations.db')
@@ -76,7 +79,7 @@ def getColoredMap(nations, gamemode):
     for i in range(width):
         for j in range(height):
             color = pixels[i, j]
-            if (color != (68, 107, 163)) and ((i + 1 < width and pixels[i + 1, j] != color) or (j + 1 < height and pixels[i, j + 1] != color)):
+            if color not in colors.keys() and ((i + 1 < width and pixels[i + 1, j] in colors.keys()) or (j + 1 < height and pixels[i, j + 1] in colors.keys())):
                 pixels[i, j] = (0, 0, 0)
             elif color not in colors:
                 pixels[i, j] = (127, 127, 127)         
