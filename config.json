@@ -1,5 +1,5 @@
 {
-    "TOKEN": "",
+    "token_file": "token.txt",
     "help_file": "README.md",
     "data_file": "data/data.json",
     "country_data_file": "data/countryDataEU4.json",

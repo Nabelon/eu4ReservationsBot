@@ -53,9 +53,7 @@ Follow these simple steps to install and configure the UpgradedReservations on y
 
 3. **Create and Configure `config.json`**
 
-   Next, modify the `config.json` file in the root directory with the following structure:
-   
-   Replace `YOUR_DISCORD_BOT_TOKEN` with your actual Discord bot token.
+   Add a `token.txt` file in the root directory containing the token of your Discord bot.
 
 4. **Set Up the Database**
 
@@ -70,13 +68,6 @@ Follow these simple steps to install and configure the UpgradedReservations on y
 - `data/tags.json`: Maps country tags to nation names and pixel locations on the map for accurate visual representation.
 - `data/country_colors.json`: Specifies nation colors for the `eu4` game mode, ensuring accurate map visuals.
 - **Images:** Store your game mode-specific map images in the `images/` directory. The bot loads these images to generate the reservation map.
-
-### **Environment Variables**
-
-To ensure the bot operates smoothly, set the following environment variables:
-
-- **TOKEN:** The bot token from your Discord Developer Portal.
-- **DATABASE_URL:** The URL path to the SQLite database.
 
 ---
 

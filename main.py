@@ -6,7 +6,9 @@ import asyncio
 with open('config.json') as config_file:
     config = json.load(config_file)
 
-TOKEN = config['TOKEN']
+with open(config['token_file']) as token_file:
+    TOKEN = token_file.readlines()[0]
+    
 tagToNations, tagToPixel, nationsToTag, nationColorsEU4 = {}, {}, {}, {}
 
 with open(config['data_file']) as json_file:
