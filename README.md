@@ -9,9 +9,9 @@
 - [How to Use](#how-to-use)
 - [Commands](#commands)
 - [Installation](#installation)
--- [Configuration](##configuration)
--- [Running the Bot](##running-the-bot)
--- [Contributing](#contributing)
+- - [Configuration](##configuration)
+- - [Running the Bot](##running-the-bot)
+- - [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
 
