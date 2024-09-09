@@ -38,9 +38,9 @@ Welcome to **EU4ReservationsBot**—your go-to solution for efficiently managing
 
 ## **how-to-use**
 
-Step 1) [**Invite the Bot to Your Server**](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot) 
-Step 2)	Write "!start" in the channel you want use for the resevations
-Step 3) You are done, reserve nations by writing "!reserve [Nation]"
+1. [**Invite the Bot to Your Server**](https://discord.com/oauth2/authorize?client_id=733588874500243486&scope=bot) 
+2. Write "!start" in the channel you want use for the resevations
+3. You are done, reserve nations by writing "!reserve [Nation]"
 
 ---
 
