@@ -1,3 +1,4 @@
+
 <div align="center">
     <img src="https://i.imgur.com/F60J2JS.png" alt="Discord Relay Bot" width="100" />
     <h1>EU4ReservationsBot</h1>
@@ -8,10 +9,10 @@
 - [Features](#features)
 - [How to Use](#how-to-use)
 - [Commands](#commands)
-- [Installation](#installation)
-- - [Configuration](##configuration)
-- - [Running the Bot](##running-the-bot)
-- - [Contributing](#contributing)
+- [Manual Installation](#installation)
+-- [Configuration](##configuration)
+-- [Running the Bot](##running-the-bot)
+-- [Contributing](#contributing)
 - [Support](#support)
 - [License](#license)
 
