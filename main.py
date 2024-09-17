@@ -133,6 +133,10 @@ async def on_message(message):
 
             if not log:
                 if message.content.startswith("!start"):
+                    if not message.author.guild_permissions.administrator:
+                        await message.author.send(f"Error: You have no administrator permissions")
+                        return
+                        
                     parts = message.content.split()
                     gamemode = parts[1].lower() if len(parts) > 1 else config["default_gamemode"]
 
