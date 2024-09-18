@@ -95,10 +95,15 @@ async def updateMap(message, reservationsChannel, reservationMapChannel, gamemod
         nations = await getReservedNations(reservationsChannel.id)
         map_img_path = "reservations.png"
         getColoredMap(nations, gamemode).save(map_img_path)
-        embed = discord.Embed(title=f"Reservations ({len(nations)})", description="Reservations List", color=discord.Color.blue())
-        embed.add_field(name="Reservations", value=createReservationsString(nations), inline=False)
+         
+        embed = discord.Embed(title=f"Reservations ({len(nations)})", description=createReservationsString(nations)+f"\n\nThis bot is hosted by [Moonlit Servers](http://moonlitservers.com/)", color=discord.Color.blue())
+        
         embed.set_image(url=f"attachment://reservations.png")
+    
+        
         file = discord.File(map_img_path, filename="reservations.png")
+        embed.set_image(url="attachment://reservations.png")
+        
         async for m in reservationMapChannel.history(limit=200):
             if client.user == m.author: 
                 await m.delete()
