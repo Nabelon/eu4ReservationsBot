@@ -74,8 +74,10 @@ def getColoredMap(nations, gamemode):
         if data[0] == [0, 0] and tagToNations[nation][0][0] in nationColorsEU4:
             cArray = nationColorsEU4[tagToNations[nation][0][0]]
             colors[(cArray[0], cArray[1], cArray[2])] = nation
+            print(f"nationColorsEU4: {nation} -> {cArray}")
         else:
             colors[pixels[data[0][0], data[0][1]]] = nation
+            print(f"colorViaPixel: {nation} -> {pixels[data[0][0], data[0][1]]} from pixel {data}")
     im = Image.open(os.path.join(config['image_dir'], gamemode + "_small.png"))
     pixels, width, height = im.load(), *im.size
     for i in range(width):
@@ -96,7 +98,7 @@ async def updateMap(message, reservationsChannel, reservationMapChannel, gamemod
         map_img_path = "reservations.png"
         getColoredMap(nations, gamemode).save(map_img_path)
          
-        embed = discord.Embed(title=f"Reservations ({len(nations)})", description=createReservationsString(nations)+f"\n\nThis bot is hosted by [Moonlit Servers](http://moonlitservers.com/)", color=discord.Color.blue())
+        embed = discord.Embed(title=f"Reservations ({len(nations)})", description=createReservationsString(nations)+f"\n", color=discord.Color.blue())
         
         embed.set_image(url=f"attachment://reservations.png")
     
@@ -175,7 +177,35 @@ async def on_message(message):
             if log:
                 gamemode = log[1]
 
-                if message.content.startswith("!reserve") or message.content.startswith("!r "):
+                if message.content.startswith("!reserveall"):
+                    try:
+                        parts = message.content.split()
+                        if len(parts) < 2:
+                            await message.author.send("You must specify at least one nation to reserve.")
+                            await delete_after_delay(message)
+                            return
+                        c.execute("SELECT user_id FROM reservations WHERE channel_id = ? AND user_id < 1000 ORDER BY user_id DESC LIMIT 1;", (message.channel.id,))
+                        generic_user_count = c.fetchone()
+                        print(f"Generic users in channel: { generic_user_count }")
+                        for i in range(1, len( parts ) ):
+                            nation = parts[i].lower()
+                            user_id = i + ( 0 if generic_user_count == None else generic_user_count[0] )
+
+                            if nation in nationsToTag:
+                                print(f"Reservall adding {nation}")
+                                c.execute('INSERT INTO reservations (server_id, channel_id, user_id, nation, date) VALUES (?, ?, ?, ?, ?)',
+                                          (message.guild.id, message.channel.id, user_id, nation, time.strftime('%Y-%m-%d %H:%M:%S')))
+                                conn.commit()
+                            else:
+                                await message.author.send(f"Nation '{nation}' not recognized.")
+                        await updateMap(message, message.channel, message.channel, gamemode=gamemode)
+                        await delete_after_delay(message)
+                    except Exception as e:
+                        await message.author.send(f"Error: \n{str(e)}")
+                        await delete_after_delay(message)
+                        print(f"Error in !reserveall command: {e}")
+                    return
+                elif message.content.startswith("!reserve") or message.content.startswith("!r "):
                     try:
                         parts = message.content.split()
                         if len(parts) < 2:
@@ -210,7 +240,6 @@ async def on_message(message):
                         await delete_after_delay(message)
                         print(f"Error in !reserve command: {e}")
                     return
-
                 if message.content.startswith("!unreserve"):
                     try:
                         user_id = message.author.id
